@@ -15,7 +15,6 @@ from django.contrib.auth.models import User
 from .forms import *
 from .models import *
 from .forms import CreateUserForm
-#from .filters import OrderFilter
 
 
 @login_required(login_url='login')
@@ -37,17 +36,41 @@ def home(request):
 
 @login_required(login_url='login')
 def create(request):
-    if request.method == 'POST':
-        form = CreateMyPollForm(request.POST)
-        if form.is_valid():
-            form.save()
-            return redirect('home')
-    else:
-        form = CreateMyPollForm()
-    context = {
-        'form' : form
-    }
-    return render(request, 'poll/create.html', context)
+	if request.method == 'POST':
+		form = CreateMyPollForm(request.POST)
+		print(form)
+		if form.is_valid():
+			profile = form.save(commit=False)
+			profile.author = request.user
+			profile.save()
+			return redirect('home')
+	else:
+		form = CreateMyPollForm()
+	context = {
+		'form' : form
+	}
+	return render(request, 'poll/create.html', context)
+
+@login_required(login_url='login')
+def delete(request, poll_id):
+	poll = MyPoll.objects.get(pk=poll_id)
+	poll.delete()
+	return redirect('/profile')
+
+""" def create(request):
+	if request.method == 'POST':
+		form = CreateMyPollForm(request.POST)
+		print(form)
+		if form.is_valid():
+			form.author = request.user.id
+			form.save()
+			return redirect('home')
+	else:
+		form = CreateMyPollForm()
+	context = {
+		'form' : form
+	}
+	return render(request, 'poll/create.html', context) """
 
 @login_required(login_url='login')
 def vote(request, poll_id):
@@ -84,9 +107,9 @@ def results(request, poll_id):
 
 @login_required(login_url='login')
 def profile(request):
-    poll = MyPoll.objects.all()
+    polls = MyPoll.objects.filter(author=request.user)
     context = {
-        'poll' : poll,
+        'polls' : polls,
 		'user' : request.user
     }
     return render(request, 'poll/profile.html', context)

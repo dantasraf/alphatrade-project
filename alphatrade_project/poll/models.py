@@ -1,7 +1,7 @@
 from django.db import models
 from django.contrib.auth.models import User
 
-class Poll(models.Model):
+""" class Poll(models.Model):
     question = models.TextField()
     option_one = models.CharField(max_length=30)
     option_two = models.CharField(max_length=30)
@@ -13,7 +13,7 @@ class Poll(models.Model):
 	#option_four_count = models.IntegerField(default=0)
 
     def total(self):
-        return self.option_one_count + self.option_two_count + self.option_three_count #+ self.option_four_count
+        return self.option_one_count + self.option_two_count + self.option_three_count #+ self.option_four_count """
 
 class MyPoll(models.Model):
     question = models.TextField()
@@ -26,7 +26,7 @@ class MyPoll(models.Model):
     option_three_count = models.IntegerField(default=0)
     option_four_count = models.IntegerField(default=0)
     
-    author = models.ForeignKey(User, on_delete=models.CASCADE)
+    author = models.ForeignKey(User, on_delete=models.CASCADE, default=None)
 
     def total(self):
         return self.option_one_count + self.option_two_count + self.option_three_count + self.option_four_count
