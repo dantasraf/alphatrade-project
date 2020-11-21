@@ -14,17 +14,6 @@ from django.contrib.auth.models import User
 
 from .forms import *
 from .models import *
-from .forms import CreateUserForm
-#from .filters import OrderFilter
-
-
-@login_required(login_url='login')
-def home(request):
-    polls = MyPoll.objects.all()
-    context = {
-        'polls' : polls
-    }
-    return render(request, 'poll/home.html', context)
 
 @login_required(login_url='login')
 def home(request):
@@ -37,17 +26,26 @@ def home(request):
 
 @login_required(login_url='login')
 def create(request):
-    if request.method == 'POST':
-        form = CreateMyPollForm(request.POST)
-        if form.is_valid():
-            form.save()
-            return redirect('home')
-    else:
-        form = CreateMyPollForm()
-    context = {
-        'form' : form
-    }
-    return render(request, 'poll/create.html', context)
+	if request.method == 'POST':
+		form = CreateMyPollForm(request.POST)
+		print(form)
+		if form.is_valid():
+			profile = form.save(commit=False)
+			profile.author = request.user
+			profile.save()
+			return redirect('home')
+	else:
+		form = CreateMyPollForm()
+	context = {
+		'form' : form
+	}
+	return render(request, 'poll/create.html', context)
+
+@login_required(login_url='login')
+def delete(request, poll_id):
+	poll = MyPoll.objects.get(pk=poll_id)
+	poll.delete()
+	return redirect('/profile')
 
 @login_required(login_url='login')
 def vote(request, poll_id):
@@ -62,6 +60,8 @@ def vote(request, poll_id):
             poll.option_two_count += 1
         elif selected_option == 'option3':
             poll.option_three_count += 1
+        elif selected_option == 'option4':
+            poll.option_four_count += 1
         else:
             return HttpResponse(400, 'Invalid form')
 
@@ -84,9 +84,9 @@ def results(request, poll_id):
 
 @login_required(login_url='login')
 def profile(request):
-    poll = MyPoll.objects.all()
+    polls = MyPoll.objects.filter(author=request.user)
     context = {
-        'poll' : poll,
+        'polls' : polls,
 		'user' : request.user
     }
     return render(request, 'poll/profile.html', context)
@@ -102,7 +102,7 @@ def registerPage(request):
 			if form.is_valid():
 				form.save()
 				user = form.cleaned_data.get('username')
-				messages.success(request, 'Account was created for ' + user)
+				messages.success(request, 'Conta criada para ' + user)
 
 				return redirect('login')
 			
@@ -124,7 +124,7 @@ def loginPage(request):
 				login(request, user)
 				return redirect('home')
 			else:
-				messages.info(request, 'Username OR password is incorrect')
+				messages.info(request, 'Usuário ou senha incorretos')
 
 		context = {}
 		return render(request, 'accounts/login.html', context)
@@ -132,83 +132,3 @@ def loginPage(request):
 def logoutUser(request):
 	logout(request)
 	return redirect('login')
-
-
-""" @login_required(login_url='login')
-def home(request):
-	orders = Order.objects.all()
-	customers = Customer.objects.all()
-
-	total_customers = customers.count()
-
-	total_orders = orders.count()
-	delivered = orders.filter(status='Delivered').count()
-	pending = orders.filter(status='Pending').count()
-
-	context = {'orders':orders, 'customers':customers,
-	'total_orders':total_orders,'delivered':delivered,
-	'pending':pending }
-
-	return render(request, 'accounts/dashboard.html', context) """
-
-""" @login_required(login_url='login')
-def products(request):
-	products = Product.objects.all()
-
-	return render(request, 'accounts/products.html', {'products':products})
-
-@login_required(login_url='login')
-def customer(request, pk_test):
-	customer = Customer.objects.get(id=pk_test)
-
-	orders = customer.order_set.all()
-	order_count = orders.count()
-
-	myFilter = OrderFilter(request.GET, queryset=orders)
-	orders = myFilter.qs 
-
-	context = {'customer':customer, 'orders':orders, 'order_count':order_count,
-	'myFilter':myFilter}
-	return render(request, 'accounts/customer.html',context)
-
-@login_required(login_url='login')
-def createOrder(request, pk):
-	OrderFormSet = inlineformset_factory(Customer, Order, fields=('product', 'status'), extra=10 )
-	customer = Customer.objects.get(id=pk)
-	formset = OrderFormSet(queryset=Order.objects.none(),instance=customer)
-	#form = OrderForm(initial={'customer':customer})
-	if request.method == 'POST':
-		#print('Printing POST:', request.POST)
-		form = OrderForm(request.POST)
-		formset = OrderFormSet(request.POST, instance=customer)
-		if formset.is_valid():
-			formset.save()
-			return redirect('/')
-
-	context = {'form':formset}
-	return render(request, 'accounts/order_form.html', context)
-
-@login_required(login_url='login')
-def updateOrder(request, pk):
-
-	order = Order.objects.get(id=pk)
-	form = OrderForm(instance=order)
-
-	if request.method == 'POST':
-		form = OrderForm(request.POST, instance=order)
-		if form.is_valid():
-			form.save()
-			return redirect('/')
-
-	context = {'form':form}
-	return render(request, 'accounts/order_form.html', context)
-
-@login_required(login_url='login')
-def deleteOrder(request, pk):
-	order = Order.objects.get(id=pk)
-	if request.method == "POST":
-		order.delete()
-		return redirect('/')
-
-	context = {'item':order}
-	return render(request, 'accounts/delete.html', context) """

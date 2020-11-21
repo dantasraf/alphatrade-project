@@ -24,6 +24,7 @@ urlpatterns = [
     path('create/', views.create, name='create'),
     path('profile/', views.profile, name='profile'),
     path('vote/<poll_id>', views.vote, name='vote'),
+    path('delete/<poll_id>', views.delete, name='delete'),
     path('results/<poll_id>', views.results, name='results'),
 
     path('register/', views.registerPage, name="register"),
@@ -31,11 +32,3 @@ urlpatterns = [
 	path('logout/', views.logoutUser, name="logout"),
 
 ] 
-
-#path('', views.home, name="home"),
-#path('products/', views.products, name='products'),
-#path('customer/<str:pk_test>/', views.customer, name="customer"),
-
-#path('create_order/<str:pk>/', views.createOrder, name="create_order"),
-#path('update_order/<str:pk>/', views.updateOrder, name="update_order"),
-#path('delete_order/<str:pk>/', views.deleteOrder, name="delete_order"),

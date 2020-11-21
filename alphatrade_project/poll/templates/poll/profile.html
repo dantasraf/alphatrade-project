@@ -7,8 +7,9 @@
     <div class="col-lg-8 col-lg-offset-2">
         <div class="panel panel-default">
             
-            <td>{{ user }}</td>
-            <td>{{ user.email }}</td>
+            <h1>Perfil</h1>
+            <p>Usuario: {{ user }}</p>
+            <p>E-mail: {{ user.email }}</p>
 
             <div class="panel-heading">
                 <h3 class="panel-title">Suas Enquetes</h3>
@@ -19,8 +20,9 @@
                 <li class="list-group-item">
                     <strong>{{ poll.question }}</strong>
                     <span class="pull-right">
-                        <a href="{% url 'vote' poll.id %}" class="btn btn-success btn-xs">Vote</a> &nbsp;
-                        <a href="{% url 'results' poll.id %}" class="btn btn-info btn-xs">View Results</a> &nbsp;
+                        <a href="{% url 'vote' poll.id %}" class="btn btn-success btn-xs">Votar</a> &nbsp;
+                        <a href="{% url 'results' poll.id %}" class="btn btn-info btn-xs">Ver Resultadoss</a> &nbsp;
+                        <a href="{% url 'delete' poll.id %}" class="btn btn-danger btn-xs">Excluir</a> &nbsp;
                     </span>
                 </li>
                 {% endfor %}
